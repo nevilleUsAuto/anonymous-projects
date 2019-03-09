@@ -6,27 +6,27 @@ public with sharing class addVehicleSoldInfoToOpportunity {
 
     public static void runUpdateProcess() {
 
-        Integer flagLimitCtr = 1000;
+        Integer flagLimitCtr = 3000;
         List<Opportunity> opToUpdate = new List<Opportunity>();
 
         List<Vehicles_Sold_Upload__c> flagUpdated = new List<Vehicles_Sold_Upload__c>();
         Map<String, Vehicles_Sold_Upload__c> mapVehSold = new Map<String, Vehicles_Sold_Upload__c>();
 
         List<Vehicles_Sold_Upload__c> vsuc = [SELECT id, name, Date_Sold__c, Sales_Portal_ID__c, Stock_Number__c, Processed__c
-            FROM Vehicles_Sold_Upload__c WHERE Processed__c = FALSE AND Sales_Portal_ID__c != '0'];
+        FROM Vehicles_Sold_Upload__c WHERE Processed__c = FALSE AND Sales_Portal_ID__c != '0'];
 
         for (Vehicles_Sold_Upload__c v : vsuc) {
             mapVehSold.put(v.Sales_Portal_ID__c, v);
         }
 
         List<Credit_Application__c> ncac = [SELECT Id, Sales_Portal_ID__c, Opportunity__c, Opportunity__r.StageName
-            FROM Credit_Application__c WHERE Sales_Portal_ID__c IN :mapVehSold.keySet()];
+        FROM Credit_Application__c WHERE Sales_Portal_ID__c IN :mapVehSold.keySet()];
 
-        List<dealer__Credit_Application__c> dcac = [SELECT Id, Sales_Portal_ID__c, Sales_Up__c
-            FROM dealer__Credit_Application__c	WHERE Sales_Portal_ID__c IN :mapVehSold.keySet()];
+        //List<dealer__Credit_Application__c> dcac = [SELECT Id, Sales_Portal_ID__c, Sales_Up__c
+        //    FROM dealer__Credit_Application__c	WHERE Sales_Portal_ID__c IN :mapVehSold.keySet()];
 
         System.debug('Count of New CA: ' + ncac.size());
-        System.debug('Count of Dealer CA: ' + dcac.size());
+        //System.debug('Count of Dealer CA: ' + dcac.size());
 
         //build list to update from new CA
         for (Credit_Application__c c : ncac) {
@@ -47,7 +47,7 @@ public with sharing class addVehicleSoldInfoToOpportunity {
             }
         }
 
-        //add to list CA to update from Sales Up
+        /*add to list CA to update from Sales Up
         Map<Id, dealer__Credit_Application__c> mapDealerCA = new Map<Id, dealer__Credit_Application__c>();
         for (dealer__Credit_Application__c c : dcac) {
             mapDealerCA.put( Id.valueOf(c.Sales_Up__c), c);
@@ -76,7 +76,7 @@ public with sharing class addVehicleSoldInfoToOpportunity {
                 vs.Processed__c = true;
                 flagUpdated.add(new Vehicles_Sold_Upload__c(Id = vs.Id, Processed__c = true ));
             }
-        }
+        }*/
 
         System.debug('Number of record to update: ' + opToUpdate.size() + '~~~~' + opToUpdate);
         System.debug('Updated processed: ' + flagUpdated);
