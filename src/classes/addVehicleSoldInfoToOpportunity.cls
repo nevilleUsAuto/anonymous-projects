@@ -39,6 +39,7 @@ public with sharing class addVehicleSoldInfoToOpportunity {
                                 Sales_Portal_ID__c = vs.Sales_Portal_ID__c,
                                 Stock_Number__c = vs.Stock_Number__c,
                                 SoldToday__c = vs.Date_Sold__c,
+                                CloseDate = vs.Date_Sold__c,
                                 StageName = (c.Opportunity__r.StageName != 'Layaway' ? 'Closed Won' : c.Opportunity__r.StageName)
                         )
                 );
@@ -46,37 +47,6 @@ public with sharing class addVehicleSoldInfoToOpportunity {
                 flagUpdated.add(new Vehicles_Sold_Upload__c(Id = vs.Id, Processed__c = true ));
             }
         }
-
-        /*add to list CA to update from Sales Up
-        Map<Id, dealer__Credit_Application__c> mapDealerCA = new Map<Id, dealer__Credit_Application__c>();
-        for (dealer__Credit_Application__c c : dcac) {
-            mapDealerCA.put( Id.valueOf(c.Sales_Up__c), c);
-        }
-
-        System.debug('Number of Dealer CA Map: ' + mapDealerCA.size());
-        Map<Id, Opportunity> idOppMap = new Map<Id, Opportunity>();
-
-        List<Opportunity> opp = [SELECT Id, Old_Sales_Up_Id__c, StageName FROM Opportunity WHERE Old_Sales_Up_Id__c IN : mapDealerCA.keySet()];
-        for (Opportunity o :opp) {
-            idOppMap.put(o.Old_Sales_Up_Id__c, o);
-        }
-        System.debug('Opportunity Map Count: ' + idOppMap.size());
-
-        for (dealer__Credit_Application__c c : dcac) {
-            Vehicles_Sold_Upload__c vs = mapVehSold.get(c.Sales_Portal_ID__c);
-            Opportunity op = idOppMap.get(c.Sales_Up__c);
-
-            if (vs != null && op != null && opToUpdate.size() <= flagLimitCtr) {
-                op.Sales_Portal_ID__c = vs.Sales_Portal_ID__c;
-                op.Stock_Number__c = vs.Stock_Number__c;
-                op.SoldToday__c = vs.Date_Sold__c;
-                op.StageName = (op.StageName != 'Layaway' ? 'Closed Won' : op.StageName);
-                opToUpdate.add(op);
-
-                vs.Processed__c = true;
-                flagUpdated.add(new Vehicles_Sold_Upload__c(Id = vs.Id, Processed__c = true ));
-            }
-        }*/
 
         System.debug('Number of record to update: ' + opToUpdate.size() + '~~~~' + opToUpdate);
         System.debug('Updated processed: ' + flagUpdated);

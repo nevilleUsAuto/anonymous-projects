@@ -10,6 +10,7 @@ public with sharing class OpportunityPhoneAndEmail {
                 'Opportunity__r.mobile__c, Opportunity__r.Phone__c, Opportunity__r.Home_Phone__c, Opportunity__r.Email__c ' +
                 'FROM Credit_Application__c ' +
                 'WHERE ( Opportunity__r.ID != \'\' ' +
+                'AND CREATEDDATE >= 2019-03-01T05:00:00Z ' +
                 'AND (' +
                 '(Opportunity__r.mobile__c = \'\' AND Buyer__r.mobilePhone != \'\') OR ' +
                 '(Opportunity__r.Phone__c = \'\' AND Buyer__r.Work_Phone__c != \'\') OR ' +
