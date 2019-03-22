@@ -6,6 +6,9 @@ public with sharing class addVehSoldToOppWebService {
 
     public class SoldVehiclesException extends Exception {}
 
+    private String startDate;
+    private String endDate;
+
     private class soldRecord {
         public String stockNo;
         public String salesPortalId;
@@ -16,23 +19,28 @@ public with sharing class addVehSoldToOppWebService {
         if (stDate == null || enDate == null) {
             System.debug('Start and End dates are required.  Process aborted...');
             throw new SoldVehiclesException('Start and End dates are required.  Process aborted...');
+        } else {
+            this.startDate = String.valueOf(stDate);
+            this.endDate = String.valueOf(enDate);
         }
-
-        this.vehicleSoldProcess(String.valueOf(stDate), String.valueOf(enDate));
+        //this.vehicleSoldProcess(String.valueOf(stDate), String.valueOf(enDate));
     }
 
-    private void vehicleSoldProcess(String st, String en) {
-        String token = usauto_webservices_controller.retrieveToken();
-        String vehList = usauto_webservices_controller.vehiclesSold(token, st, en);
-        System.debug(vehList);
-
-        List<soldRecord> sRec = (List<soldRecord>) JSON.deserialize(vehList, List<soldRecord>.class);
-        System.debug('Number of sold records to update: ' + sRec.size());
-
-        this.processVehicles(sRec);
+    public String getToken() {
+        return usauto_webservices_controller.retrieveToken();
     }
 
-    private void processVehicles(List<soldRecord> soldRecords ) {
+    @TestVisible private List<soldRecord> getVehiclesRecords(String t) {
+        String vh = usauto_webservices_controller.vehiclesSold(t, this.startDate, this.endDate);
+        System.debug('Vehicle List: ' + vh);
+        return (List<soldRecord>) JSON.deserialize(vh, List<soldRecord>.class);
+    }
+
+    public Integer vehicleSoldProcess(String token) {
+        return (this.processVehicles( this.getVehiclesRecords(token) ));
+    }
+
+    private Integer processVehicles(List<soldRecord> soldRecords ) {
         Map<String, soldRecord> mapVehSold = new Map<String, soldRecord>();
         List<Opportunity> opToUpdate = new List<Opportunity>();
 
@@ -63,13 +71,13 @@ public with sharing class addVehSoldToOppWebService {
                                 StageName = (c.Opportunity__r.StageName != 'Layaway' ? 'Closed Won' : c.Opportunity__r.StageName)
                         )
                 );
-
-
             }
         }
 
         System.debug('Number of record to update: ' + opToUpdate.size() + '~~~~' + opToUpdate);
         //update opToUpdate;
+
+        return opToUpdate.size();
     }
 
 }

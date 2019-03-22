@@ -116,7 +116,7 @@ public with sharing class usauto_webservices_controller {
     @AuraEnabled
     public static String vehiclesSold(String securityToken, String st, String en) {
         String result = null;
-        Map<String, Object> token =   (Map<String, Object>) JSON.deserializeUntyped(securityToken);
+        Map<String, Object> token = (Map<String, Object>) JSON.deserializeUntyped(securityToken);
 
         if (st != null && en != null) {
 
