@@ -20,7 +20,7 @@ public with sharing class addVehicleSoldInfoToOpportunity {
         }
 
         List<Credit_Application__c> ncac = [SELECT Id, Sales_Portal_ID__c, Opportunity__c, Opportunity__r.StageName
-        FROM Credit_Application__c WHERE Sales_Portal_ID__c IN :mapVehSold.keySet()];
+         FROM Credit_Application__c WHERE Sales_Portal_ID__c IN :mapVehSold.keySet()];
 
         //List<dealer__Credit_Application__c> dcac = [SELECT Id, Sales_Portal_ID__c, Sales_Up__c
         //    FROM dealer__Credit_Application__c	WHERE Sales_Portal_ID__c IN :mapVehSold.keySet()];
