@@ -66,8 +66,9 @@ public with sharing class usauto_webservices_controller {
             }
 
         } catch (Exception e) {
-            score = 'Error: getCreditApplication Try/Catch: ' + e.getMessage();
-            System.debug(score);
+            String errMsg = 'Error: (usauto_webservices_controller->webServiceGet): ' + e.getMessage();
+            System.debug(errMsg);
+            throw new webServicesException(errMsg);
         }
 
         return score;
@@ -95,18 +96,20 @@ public with sharing class usauto_webservices_controller {
             msgBody.writeStringField('password', userPswd);
             msgBody.writeEndObject();
 
-            System.debug('get token body: ' + msgBody);
+            //System.debug('get token body: ' + msgBody);
             request.setBody(msgBody.getAsString());
             response = http.send(request);
 
-            System.debug('Response Message: ' + response.getStatusCode() + ' ~~~ ' + response.getBody());
+            //System.debug('Response Message: ' + response.getStatusCode() + ' ~~~ ' + response.getBody());
             if (response.getStatusCode() == 200) {
                 token = response.getBody(); //JSON.serialize(fr);
             } else {
                 System.debug(response.getStatusCode());
             }
         } catch (Exception e) {
-            token = 'Error: Try/Catch: ' + e.getMessage();
+            String errMsg = 'Error: (usauto_webservices_controller->retrieveToken) ' + e.getMessage();
+            System.debug(errMsg);
+            throw new webServicesException(errMsg);
         }
 
         return token;
@@ -116,16 +119,16 @@ public with sharing class usauto_webservices_controller {
     @AuraEnabled
     public static String vehiclesSold(String securityToken, String st, String en) {
         String result = null;
-        Map<String, Object> token = (Map<String, Object>) JSON.deserializeUntyped(securityToken);
 
         if (st != null && en != null) {
 
             try {
+                Map<String, Object> token = (Map<String, Object>) JSON.deserializeUntyped(securityToken);
                 String securityKey = 'Authorization';
                 String securityValue = 'Bearer ' + token.get('access_token');
                 String callMethod = 'POST';
 
-                System.debug('inside vehicleSold Method on mw_worksheet_controller');
+                System.debug('inside vehicleSold Method on usauto_webservices_controller');
 
                 JSONGenerator generator = JSON.createGenerator(true);    //instantiation of the generator
                 generator.writeStartObject();                // Writes the starting marker of a JSON object '{'
@@ -140,11 +143,16 @@ public with sharing class usauto_webservices_controller {
                 System.debug('Inside vehicle sold Result: ' + result);
 
             } catch (Exception ex) {
-                result = 'Error Occurred: ' + ex.getMessage();
+                String errMsg = 'Error: (usauto_webservices_controller->vehiclesSold) ' + ex.getMessage();
+                System.debug(errMsg);
+                throw new webServicesException(errMsg);
             }
         }
 
         return result;
     }
+
+    public class webServicesException extends Exception {}
+
 
 }

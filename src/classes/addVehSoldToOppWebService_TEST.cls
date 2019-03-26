@@ -5,15 +5,20 @@
 @IsTest
 public with sharing class addVehSoldToOppWebService_TEST {
 
+    /*
+
+    HAD TO CREATED DATA LOCALLY TO AVOID CALLOUT ISSUES IN SCHEDULABLE TEST METHOD.
+
     @TestSetup static void setup() {
 
         List<Integer> portalId = new List<Integer>{167718, 168199, 169656, 172301, 172230, 172243, 172198, 171569, 170402};
-
         TestDataFactory_Opportunity.makeCreditApplications(9, true, portalId);
 
-    }
+    } */
 
     @IsTest static void test1GetToken() {
+        List<Integer> portalId = new List<Integer>{167718, 168199, 169656, 172301, 172230, 172243, 172198, 171569, 170402};
+        TestDataFactory_Opportunity.makeCreditApplications(9, true, portalId);
 
         Test.setMock(HttpCalloutMock.class, new addVehSoldToOppWebService_Token_MOCK());
 
@@ -30,6 +35,9 @@ public with sharing class addVehSoldToOppWebService_TEST {
     }
 
     @IsTest static void test2ProcessVehicles() {
+        List<Integer> portalId = new List<Integer>{167718, 168199, 169656, 172301, 172230, 172243, 172198, 171569, 170402};
+        TestDataFactory_Opportunity.makeCreditApplications(9, true, portalId);
+
         String token='{"access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9","expiration": "2299-11-26T13:37:42Z"}';
         Test.setMock(HttpCalloutMock.class, new addVehSoldToOppWebService_MOCK());
 
@@ -45,6 +53,8 @@ public with sharing class addVehSoldToOppWebService_TEST {
     }
 
     @IsTest static void test3Scheduler() {
+
+        Test.setMock(HttpCalloutMock.class, new addVehSoldToOppWebService_Token_MOCK());
         Test.startTest();
 
         // Schedule the test job
@@ -53,7 +63,7 @@ public with sharing class addVehSoldToOppWebService_TEST {
 
         // Get the information from the CronTrigger API object
         CronTrigger ct = [SELECT Id, CronExpression, TimesTriggered, NextFireTime
-            FROM CronTrigger WHERE id = :jobId];
+            FROM CronTrigger WHERE Id = :jobId];
 
         // Verify the expressions are the same
         System.assertEquals(addVehSoldToOppWebService_Scheduler.CRON_EXP,
